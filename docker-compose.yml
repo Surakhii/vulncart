@@ -1,0 +1,32 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      - SECURE_MODE=${SECURE_MODE:-false}
+      - DB_PATH=/data/vulncart.db
+    volumes:
+      - db_data:/data
+    restart: unless-stopped
+    networks:
+      - app
+
+  nginx:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - backend
+    restart: unless-stopped
+    networks:
+      - app
+
+volumes:
+  db_data:
+
+networks:
+  app:
